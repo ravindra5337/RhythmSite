@@ -1,0 +1,145 @@
+  <!DOCTYPE html>
+  <html>
+  <body>
+    <style>
+
+      /*html, body {
+    pointer-events: none;
+}*/
+
+      div.disabled { 
+        pointer-events: none; 
+        -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; 
+        user-select: none;          
+      }
+      div.disabled *:focus { outline: 0; }
+    </style>
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+      <div id="player" class="box"></div>
+
+      <script>
+
+        var noInteracts = document.getElementsByClassName('disabled');
+        [].map.call(noInteracts, function(elem) {
+          elem.addEventListener("keydown", function(e) {
+            if (e.keyCode != 9) {
+              e.returnValue = false;
+              return false;
+            }
+          }, true);
+        });
+        document.querySelector('.box').addEventListener('contextmenu', function(event) {
+          event.preventDefault();
+        });
+
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
+        var player;
+        function onYouTubeIframeAPIReady() {
+         console.log("onYouTubeIframeAPIReady");
+         loadVideo('wr9M-CoxP7A');
+       }
+
+       function loadX(){
+        loadVideo('JtPbk7WvHAQ',480,270);
+        
+      }
+      function loadVideo(vid){
+       console.log("calling yt player");
+       player = new YT.Player('player', {
+        height: 480,
+        width: 270,
+        videoId:vid,
+        playerVars: {
+          'playsinline': 1,
+          'autoplay':1,
+          'controls':0,
+          'disablekb':1,
+          'fs':0,
+              // 'origin': window.location.origin ,
+          // 'host': 'https://www.youtube.com',
+          // 'origin':'https://localhost:8100',
+          'enablejsapi':1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError':onPlayerError
+        }
+      }); 
+     }
+
+     function getVideoDuration(){
+      return player.getDuration();
+     }
+
+     function onPlayerReady(event) {
+      console.log("VIDEO LOADED");
+      vd=player.getVideoEmbedCode();
+      location.href = "uniwebview://onPlayerReady?data={\"video_url\":\""+vd+"\""+"}";
+    }
+
+    function loadVideowithW(vid,ww,wh){
+      player = new YT.Player('player', {
+        height: wh,
+        width: ww,
+        videoId:vid,
+        playerVars: {
+          'playsinline': 1,
+          'origin': 'https://localhost:8100' ,
+          'enablejsapi':1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError':onPlayerError
+        }
+      });
+    }
+    
+    function setVideoSize(width,height){
+      player.setSize(width, height);
+    }
+
+    function onPlayerError(event){
+      console.log("Hello "+event.data);
+    }
+        // 4. The API will call this function when the video player is ready.
+    
+
+        // 5. The API calls this function when the player's state changes.
+        //    The function indicates that when playing a video (state=1),
+        //    the player should play for six seconds and then stop.
+    var done = false;
+    function onPlayerStateChange(event) {
+      console.log("VIDEO onPlayerStateChange");
+          // if (event.data == YT.PlayerState.PLAYING && !done) {
+          //   setTimeout(stopVideo, 6000);
+          //   done = true;
+          // }
+    }
+    function  getCurrentTime(){ return player.getCurrentTime();}
+
+    function seekTo(seconds) {
+      player.seekTo(seconds);
+    }
+
+    function stopVideo() {
+      player.stopVideo();
+    }
+    function resumeVideo() {
+      player.playVideo();
+    }
+    function pauseVideo() {
+      player.pauseVideo();
+    }
+  </script>
+</body>
+</html>
